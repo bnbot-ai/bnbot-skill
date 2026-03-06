@@ -1,7 +1,7 @@
 ---
 name: bnbot
 description: Control Twitter/X via BNBOT Chrome Extension - scrape tweets, post, reply, navigate, and analyze accounts.
-version: 0.4.0
+version: 0.4.3
 homepage: https://github.com/jackleeio/bnbot-mcp-server
 metadata:
   openclaw:
@@ -17,9 +17,13 @@ metadata:
         label: Install bnbot-mcp-server (npm)
 ---
 
-# BNBOT - Control Twitter/X with AI
+# BNBot - Control Twitter/X with AI
 
-BNBOT lets you control Twitter/X directly from your AI assistant through the BNBOT Chrome Extension.
+BNBot lets you control Twitter/X directly from your AI assistant through the BNBot Chrome Extension.
+
+- **Chrome Extension**: [BNBot - Your AI Growth Agent](https://chromewebstore.google.com/detail/bnbot-your-ai-growth-agen/haammgigdkckogcgnbkigfleejpaiiln)
+- **MCP Server**: [bnbot-mcp-server](https://www.npmjs.com/package/bnbot-mcp-server)
+- **GitHub**: [jackleeio/bnbot-mcp-server](https://github.com/jackleeio/bnbot-mcp-server)
 
 ## Auto Setup (IMPORTANT - Run on first use)
 
