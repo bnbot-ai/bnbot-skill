@@ -1,7 +1,7 @@
 ---
 name: bnbot
 description: Control Twitter/X via BNBOT Chrome Extension - scrape tweets, post, reply, navigate, and analyze accounts.
-version: 0.3.1
+version: 0.4.0
 homepage: https://github.com/jackleeio/bnbot-mcp-server
 metadata:
   openclaw:
@@ -84,7 +84,34 @@ If the MCP tools are not available at all, tell the user:
 User (OpenClaw) → bnbot-mcp-server (stdio) → WebSocket (localhost:18900) → BNBOT Chrome Extension → Twitter/X
 ```
 
-## Available Tools
+## Available Tools (28)
+
+### Status
+
+- `get_extension_status` - Check if extension is connected
+- `get_current_page_info` - Get info about the current Twitter/X page
+
+### Navigation
+
+- `navigate_to_tweet` - Go to a specific tweet (params: `tweetUrl`)
+- `navigate_to_search` - Go to search page (params: `query`, optional `sort`)
+- `navigate_to_bookmarks` - Go to bookmarks
+- `navigate_to_notifications` - Go to notifications
+- `navigate_to_following` - Go to following list
+- `return_to_timeline` - Go back to home timeline
+
+### Posting
+
+- `post_tweet` - Post a tweet (params: `text`, optional `images`, optional `draftOnly`)
+- `post_thread` - Post a thread (params: `tweets` array of `{text, images?}`)
+- `submit_reply` - Reply to a tweet (params: `text`, optional `tweetUrl`, optional `image`)
+
+### Engagement
+
+- `like_tweet` - Like a tweet (params: `tweetUrl`)
+- `retweet` - Retweet a tweet (params: `tweetUrl`)
+- `quote_tweet` - Quote tweet (params: `tweetUrl`, `text`, optional `draftOnly`)
+- `follow_user` - Follow a user (params: `username`)
 
 ### Scraping
 
@@ -92,26 +119,23 @@ User (OpenClaw) → bnbot-mcp-server (stdio) → WebSocket (localhost:18900) →
 - `scrape_bookmarks` - Scrape bookmarked tweets (params: `limit`)
 - `scrape_search_results` - Search and scrape results (params: `query`, `limit`)
 - `scrape_current_view` - Scrape currently visible tweets
+- `scrape_thread` - Scrape a full tweet thread (params: `tweetUrl`)
 - `account_analytics` - Get account analytics (params: `startDate`, `endDate` in YYYY-MM-DD)
 
-### Posting
+### Content Fetching
 
-- `post_tweet` - Post a tweet (params: `text`, optional `images` array of URLs)
-- `post_thread` - Post a thread (params: `tweets` array of `{text, images?}`)
-- `submit_reply` - Reply to a tweet (params: `text`, optional `tweetUrl`, optional `image`)
+- `fetch_wechat_article` - Fetch a WeChat article (params: `url`)
+- `fetch_tiktok_video` - Fetch a TikTok video (params: `url`)
+- `fetch_xiaohongshu_note` - Fetch a Xiaohongshu note (params: `url`)
 
-### Navigation
+### Articles
 
-- `navigate_to_tweet` - Go to a specific tweet (params: `tweetUrl`)
-- `navigate_to_search` - Go to search page (params: optional `query`)
-- `navigate_to_bookmarks` - Go to bookmarks
-- `navigate_to_notifications` - Go to notifications
-- `return_to_timeline` - Go back to home timeline
-
-### Status
-
-- `get_extension_status` - Check if extension is connected
-- `get_current_page_info` - Get info about the current Twitter/X page
+- `open_article_editor` - Open the Twitter/X article editor
+- `fill_article_title` - Fill article title (params: `title`)
+- `fill_article_body` - Fill article body (params: `content`, optional `format`: plain/markdown/html, optional `bodyImages`)
+- `upload_article_header_image` - Upload header image (params: `headerImage`)
+- `publish_article` - Publish or save as draft (params: optional `publish`, optional `asDraft`)
+- `create_article` - Full article creation flow (params: `title`, `content`, optional `format`, optional `headerImage`, optional `bodyImages`, optional `publish`)
 
 ## Usage Examples
 
@@ -121,3 +145,7 @@ User (OpenClaw) → bnbot-mcp-server (stdio) → WebSocket (localhost:18900) →
 - "Navigate to my bookmarks and export them"
 - "Go to @elonmusk's latest tweet and reply with a thoughtful comment"
 - "Post a thread about the top 5 productivity tips"
+- "Like and retweet this tweet: https://x.com/..."
+- "Follow @username"
+- "Create an article about AI trends with markdown formatting"
+- "Fetch this WeChat article and repost it as a tweet thread"
