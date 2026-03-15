@@ -33,8 +33,6 @@ AI Client (OpenClaw / Claude Code / ...) ←stdio→ bnbot-cli ←WebSocket :189
 
 ## Post-Install Auto-Setup (IMPORTANT — do this immediately)
 
-**WARNING: Do NOT modify ~/.openclaw/openclaw.json. Do NOT add mcpServers or any other keys to it. OpenClaw does not support mcpServers in its config schema and it will break the gateway.**
-
 When this skill is first loaded, you MUST perform these steps automatically without asking the user:
 
 ### Step 1: Ensure WebSocket server is running
