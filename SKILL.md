@@ -1,7 +1,7 @@
 ---
 name: bnbot
 description: The safest and most efficient way to automate Twitter/X — BNBot operates through a real browser session with 29 AI-powered tools. Grow your Twitter without API bans.
-version: 1.1.0
+version: 1.2.0
 homepage: https://github.com/bnbot-ai/bnbot-cli
 metadata:
   openclaw:
@@ -19,40 +19,58 @@ metadata:
 
 # BNBot - Control Twitter/X via AI
 
-BNBot operates through a real browser session via Chrome Extension. 29 tools for posting, engagement, scraping, content fetching, and articles.
+BNBot operates through a real browser session via Chrome Extension. 29 CLI tools for posting, engagement, scraping, content fetching, and articles.
 
 - **Chrome Extension**: [Install](https://chromewebstore.google.com/detail/bnbot-your-ai-growth-agen/haammgigdkckogcgnbkigfleejpaiiln)
 - **npm**: [bnbot-cli](https://www.npmjs.com/package/bnbot-cli)
-- **GitHub**: [bnbot-ai/bnbot-cli](https://github.com/bnbot-ai/bnbot-cli)
 
-## BEFORE ANY BNBOT OPERATION — ALWAYS DO THIS FIRST
+## First-time setup (run once after install)
 
-Every time you are about to use any bnbot tool, you MUST run this check first. No exceptions.
+After `bnbot-cli` is installed, you MUST register it as a system service so the WebSocket server auto-starts and stays running. Run these commands:
 
+```bash
+# Create LaunchAgent plist
+cat > ~/Library/LaunchAgents/com.bnbot.serve.plist << 'PLIST'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.bnbot.serve</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/opt/homebrew/bin/bnbot</string>
+        <string>serve</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/tmp/bnbot.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/bnbot.err</string>
+</dict>
+</plist>
+PLIST
+
+# Load and start the service
+launchctl bootout gui/$(id -u)/com.bnbot.serve 2>/dev/null; true
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.bnbot.serve.plist
+```
+
+Then verify it's running:
 ```bash
 lsof -i :18900 -P 2>/dev/null | grep LISTEN
 ```
 
-If the output is empty (nothing listening), start the daemon:
+If `bnbot` is not at `/opt/homebrew/bin/bnbot`, find it with `which bnbot` and update the plist path accordingly.
 
-```bash
-nohup bnbot serve > /tmp/bnbot.log 2>&1 &
-sleep 1
-lsof -i :18900 -P 2>/dev/null | grep LISTEN
-```
+This only needs to be done ONCE. After this, `bnbot serve` will auto-start on login and restart if it crashes.
 
-If it still fails, the binary may not be installed. Install it:
+## How to use tools
 
-```bash
-npm install -g bnbot-cli
-nohup bnbot serve > /tmp/bnbot.log 2>&1 &
-```
-
-Only proceed with bnbot commands after confirming port 18900 is LISTEN.
-
-## How to use tools (CLI mode)
-
-All tools are executed via the `bnbot` CLI. Use the `exec` tool to run these commands:
+All tools are executed via the `bnbot` CLI:
 
 ```bash
 bnbot get-extension-status
@@ -61,11 +79,11 @@ bnbot scrape-timeline --limit 10
 bnbot navigate-to-search --query "AI agents"
 ```
 
-The output is JSON. Parse it to get the result.
+Output is JSON.
 
 ## If extension is not connected
 
-After running `bnbot get-extension-status`, if it shows `connected: false`, tell the user:
+If `bnbot get-extension-status` shows `connected: false`, tell the user:
 
 > Chrome Extension is not connected. Please:
 > 1. Install extension: https://chromewebstore.google.com/detail/bnbot-your-ai-growth-agen/haammgigdkckogcgnbkigfleejpaiiln
@@ -79,44 +97,44 @@ After running `bnbot get-extension-status`, if it shows `connected: false`, tell
 - `bnbot get-current-page-info` — Get current Twitter/X page info
 
 ### Navigation
-- `bnbot navigate-to-tweet --tweetUrl <url>` — Go to a specific tweet
-- `bnbot navigate-to-search --query "..." [--sort ...]` — Search page
-- `bnbot navigate-to-bookmarks` — Go to bookmarks
-- `bnbot navigate-to-notifications` — Go to notifications
-- `bnbot navigate-to-following` — Go to following list
-- `bnbot return-to-timeline` — Go back to home timeline
+- `bnbot navigate-to-tweet --tweetUrl <url>`
+- `bnbot navigate-to-search --query "..." [--sort ...]`
+- `bnbot navigate-to-bookmarks`
+- `bnbot navigate-to-notifications`
+- `bnbot navigate-to-following`
+- `bnbot return-to-timeline`
 
 ### Posting
-- `bnbot post-tweet --text "..."` — Post a tweet
-- `bnbot post-thread --tweets '[{"text":"..."},{"text":"..."}]'` — Post a thread
-- `bnbot submit-reply --text "..." [--tweetUrl <url>]` — Reply to a tweet
-- `bnbot quote-tweet --tweetUrl <url> --text "..."` — Quote a tweet
+- `bnbot post-tweet --text "..."`
+- `bnbot post-thread --tweets '[{"text":"..."},{"text":"..."}]'`
+- `bnbot submit-reply --text "..." [--tweetUrl <url>]`
+- `bnbot quote-tweet --tweetUrl <url> --text "..."`
 
 ### Engagement
-- `bnbot like-tweet [--tweetUrl <url>]` — Like a tweet
-- `bnbot retweet [--tweetUrl <url>]` — Retweet
-- `bnbot follow-user --username <handle>` — Follow a user
+- `bnbot like-tweet [--tweetUrl <url>]`
+- `bnbot retweet [--tweetUrl <url>]`
+- `bnbot follow-user --username <handle>`
 
 ### Scraping
-- `bnbot scrape-timeline --limit <n> --scrollAttempts <n>` — Scrape timeline
-- `bnbot scrape-bookmarks --limit <n>` — Scrape bookmarks
-- `bnbot scrape-search-results --query "..." --limit <n>` — Search and scrape
-- `bnbot scrape-current-view` — Scrape visible tweets
-- `bnbot scrape-thread --tweetUrl <url>` — Scrape a thread
-- `bnbot account-analytics --startDate YYYY-MM-DD --endDate YYYY-MM-DD` — Analytics
+- `bnbot scrape-timeline --limit <n> --scrollAttempts <n>`
+- `bnbot scrape-bookmarks --limit <n>`
+- `bnbot scrape-search-results --query "..." --limit <n>`
+- `bnbot scrape-current-view`
+- `bnbot scrape-thread --tweetUrl <url>`
+- `bnbot account-analytics --startDate YYYY-MM-DD --endDate YYYY-MM-DD`
 
 ### Content Fetching
-- `bnbot fetch-wechat-article --url <url>` — Fetch WeChat article
-- `bnbot fetch-tiktok-video --url <url>` — Fetch TikTok video
-- `bnbot fetch-xiaohongshu-note --url <url>` — Fetch Xiaohongshu note
+- `bnbot fetch-wechat-article --url <url>`
+- `bnbot fetch-tiktok-video --url <url>`
+- `bnbot fetch-xiaohongshu-note --url <url>`
 
 ### Articles
-- `bnbot open-article-editor` — Open article editor
-- `bnbot fill-article-title --title "..."` — Fill title
-- `bnbot fill-article-body --content "..." [--format markdown]` — Fill body
-- `bnbot upload-article-header-image --headerImage <path>` — Upload header
-- `bnbot publish-article [--publish true]` — Publish article
-- `bnbot create-article --title "..." --content "..." [--format markdown]` — Full flow
+- `bnbot open-article-editor`
+- `bnbot fill-article-title --title "..."`
+- `bnbot fill-article-body --content "..." [--format markdown]`
+- `bnbot upload-article-header-image --headerImage <path>`
+- `bnbot publish-article [--publish true]`
+- `bnbot create-article --title "..." --content "..." [--format markdown]`
 
 ### Jobs
-- `bnbot search-jobs [--type boost] [--limit 10]` — Search crypto reward jobs
+- `bnbot search-jobs [--type boost] [--limit 10]`
