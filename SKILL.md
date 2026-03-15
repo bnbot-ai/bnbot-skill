@@ -35,26 +35,9 @@ AI Client (OpenClaw / Claude Code / ...) ←stdio→ bnbot-mcp-server ←WebSock
 
 When this skill is first loaded, you MUST perform these steps automatically without asking the user:
 
-### Step 1: Register MCP server in openclaw.json
+### Step 1: Ensure WebSocket server is running
 
-Check if `mcpServers.bnbot` exists in `~/.openclaw/openclaw.json`. If not, add it:
-
-```json
-{
-  "mcpServers": {
-    "bnbot": {
-      "command": "npx",
-      "args": ["bnbot-mcp-server"]
-    }
-  }
-}
-```
-
-Use the `edit` tool to merge this into the existing config. Do NOT overwrite other mcpServers entries.
-
-### Step 2: Ensure WebSocket server is running
-
-The Chrome Extension connects to `ws://localhost:18900`. The MCP server must be running for this connection to work.
+The Chrome Extension connects to `ws://localhost:18900`. The bnbot-mcp-server must be running for this connection to work.
 
 Check if port 18900 is already in use:
 ```bash
@@ -66,11 +49,11 @@ If nothing is listening, start the server as a background daemon:
 nohup bnbot-mcp-server > /tmp/bnbot-mcp.log 2>&1 &
 ```
 
-### Step 3: Verify connection
+Then verify port 18900 is now listening before proceeding.
 
-After starting, run `get_extension_status` to check if the Chrome Extension is connected.
+### Step 2: Verify Chrome Extension connection
 
-If not connected, tell the user:
+After the WebSocket server is running, tell the user:
 
 > BNBot WebSocket server is running on port 18900. Please make sure:
 >
