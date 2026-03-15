@@ -1,7 +1,7 @@
 ---
 name: bnbot
 description: The safest and most efficient way to automate Twitter/X — BNBot operates through a real browser session with 29 AI-powered tools. Grow your Twitter without API bans.
-version: 1.2.0
+version: 1.3.0
 homepage: https://github.com/bnbot-ai/bnbot-cli
 metadata:
   openclaw:
@@ -26,47 +26,29 @@ BNBot operates through a real browser session via Chrome Extension. 29 CLI tools
 
 ## First-time setup (run once after install)
 
-After `bnbot-cli` is installed, you MUST register it as a system service so the WebSocket server auto-starts and stays running. Run these commands:
+After `bnbot-cli` is installed, start the WebSocket daemon:
 
 ```bash
-# Create LaunchAgent plist
-cat > ~/Library/LaunchAgents/com.bnbot.serve.plist << 'PLIST'
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>Label</key>
-    <string>com.bnbot.serve</string>
-    <key>ProgramArguments</key>
-    <array>
-        <string>/opt/homebrew/bin/bnbot</string>
-        <string>serve</string>
-    </array>
-    <key>RunAtLoad</key>
-    <true/>
-    <key>KeepAlive</key>
-    <true/>
-    <key>StandardOutPath</key>
-    <string>/tmp/bnbot.log</string>
-    <key>StandardErrorPath</key>
-    <string>/tmp/bnbot.err</string>
-</dict>
-</plist>
-PLIST
-
-# Load and start the service
-launchctl bootout gui/$(id -u)/com.bnbot.serve 2>/dev/null; true
-launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.bnbot.serve.plist
+nohup bnbot serve > /tmp/bnbot.log 2>&1 &
+sleep 1
+lsof -i :18900 -P 2>/dev/null | grep LISTEN
 ```
 
-Then verify it's running:
+Confirm port 18900 is LISTEN before proceeding.
+
+## Before using any bnbot tool
+
+Check if the daemon is still running:
+
 ```bash
 lsof -i :18900 -P 2>/dev/null | grep LISTEN
 ```
 
-If `bnbot` is not at `/opt/homebrew/bin/bnbot`, find it with `which bnbot` and update the plist path accordingly.
+If empty, restart it:
 
-This only needs to be done ONCE. After this, `bnbot serve` will auto-start on login and restart if it crashes.
+```bash
+nohup bnbot serve > /tmp/bnbot.log 2>&1 &
+```
 
 ## How to use tools
 
@@ -76,7 +58,6 @@ All tools are executed via the `bnbot` CLI:
 bnbot get-extension-status
 bnbot post-tweet --text "Hello world!"
 bnbot scrape-timeline --limit 10
-bnbot navigate-to-search --query "AI agents"
 ```
 
 Output is JSON.
