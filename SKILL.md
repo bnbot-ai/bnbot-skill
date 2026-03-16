@@ -62,6 +62,10 @@ bnbot scrape-timeline --limit 10
 
 Output is JSON.
 
+**Auto-thread for multiple images**: When `post-tweet` receives more than 4 images (Twitter's limit), it automatically splits into a thread — first tweet gets the text + first 4 images, subsequent tweets get remaining images in batches of 4. You don't need to manually use `post-thread` for this.
+
+When scraping content from Xiaohongshu or other platforms with many images (e.g. 10), just pass all images to `post-tweet` and it handles the splitting automatically.
+
 ## If extension is not connected
 
 If `bnbot get-extension-status` shows `connected: false`, tell the user:
