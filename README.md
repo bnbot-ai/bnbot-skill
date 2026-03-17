@@ -1,65 +1,125 @@
-# BNBot Skill
+---
+name: bnbot
+description: The safest and most efficient way to automate Twitter/X — BNBot operates through a real browser session with 29 AI-powered tools. Grow your Twitter without API bans.
+version: 1.3.0
+homepage: https://github.com/bnbot-ai/bnbot-cli
+metadata:
+  openclaw:
+    emoji: "\U0001F916"
+    os: [darwin, linux, windows]
+    requires:
+      bins: [bnbot-cli]
+    install:
+      - id: node
+        kind: node
+        package: bnbot-cli
+        bins: [bnbot-cli]
+        label: Install bnbot-cli (npm)
+---
 
-The safest and most efficient way to automate Twitter/X — [BNBot](https://chromewebstore.google.com/detail/bnbot-your-ai-growth-agen/haammgigdkckogcgnbkigfleejpaiiln) operates through a real browser session with 28 AI-powered tools.
+# BNBot - Control Twitter/X via AI
 
-## Install
+BNBot operates through a real browser session via Chrome Extension. 29 CLI tools for posting, engagement, scraping, content fetching, and articles.
+
+- **Chrome Extension**: [Install](https://chromewebstore.google.com/detail/bnbot-your-ai-growth-agen/haammgigdkckogcgnbkigfleejpaiiln)
+- **npm**: [bnbot-cli](https://www.npmjs.com/package/bnbot-cli)
+
+## First-time setup (run once after install)
+
+After `bnbot-cli` is installed, start the WebSocket daemon:
 
 ```bash
-clawhub install bnbot
+nohup bnbot serve > /tmp/bnbot.log 2>&1 &
+sleep 1
+lsof -i :18900 -P 2>/dev/null | grep LISTEN
 ```
 
-Or search for "bnbot" on [ClawHub](https://clawhub.ai/).
+Confirm port 18900 is LISTEN before proceeding.
 
-## Setup
+## Before using any bnbot tool
 
-1. Install the [BNBot Chrome Extension](https://chromewebstore.google.com/detail/bnbot-your-ai-growth-agen/haammgigdkckogcgnbkigfleejpaiiln)
-2. Open [Twitter/X](https://x.com) in Chrome
-3. Open the BNBot sidebar and enable **MCP** in Settings
-4. Add the MCP server config to your AI client (the skill will show you the config and ask for your approval before any changes)
+Check if the daemon is still running:
 
-## Architecture
-
-```mermaid
-flowchart LR
-    subgraph "AI Client"
-        A[Claude Code / OpenClaw / ChatGPT] -->|"MCP (stdio)"| B[bnbot-mcp-server]
-    end
-    subgraph Local
-        B -->|"WebSocket\nlocalhost:18900"| C[BNBot Chrome Extension]
-    end
-    subgraph Browser
-        C -->|"DOM Operations"| D[Twitter/X]
-    end
-
-    style A fill:#e8f4f8
-    style B fill:#fff3cd
-    style C fill:#d4edda
-    style D fill:#e2e3e5
+```bash
+lsof -i :18900 -P 2>/dev/null | grep LISTEN
 ```
 
-## What It Does
+If empty, restart it:
 
-This skill lets your AI assistant control Twitter/X through 28 tools:
+```bash
+nohup bnbot serve > /tmp/bnbot.log 2>&1 &
+```
 
-- **Post** tweets, threads, and long-form articles (with Markdown support)
-- **Engage** — like, retweet, quote tweet, reply, follow
-- **Scrape** timeline, bookmarks, search results, threads, and account analytics
-- **Fetch content** from WeChat, TikTok, and Xiaohongshu for cross-platform repurposing
-- **Navigate** Twitter pages (tweets, search, bookmarks, notifications)
+## How to use tools
 
-All actions go through your real browser session — indistinguishable from manual human behavior, so your account stays safe.
+All tools are executed via the `bnbot` CLI:
 
-## Requirements
+```bash
+bnbot get-extension-status
+bnbot post-tweet --text "Hello world!"
+bnbot scrape-timeline --limit 10
+```
 
-- [BNBot Chrome Extension](https://chromewebstore.google.com/detail/bnbot-your-ai-growth-agen/haammgigdkckogcgnbkigfleejpaiiln) installed and MCP enabled
-- Twitter/X open in Chrome
-- [bnbot-mcp-server](https://www.npmjs.com/package/bnbot-mcp-server) configured in your AI client's MCP config
+Output is JSON.
 
-## Links
+**Auto-thread for multiple images**: When `post-tweet` receives more than 4 images (Twitter's limit), it automatically splits into a thread — first tweet gets the text + first 4 images, subsequent tweets get remaining images in batches of 4. You don't need to manually use `post-thread` for this.
 
-- [BNBot Chrome Extension](https://chromewebstore.google.com/detail/bnbot-your-ai-growth-agen/haammgigdkckogcgnbkigfleejpaiiln)
-- [bnbot-mcp-server (npm)](https://www.npmjs.com/package/bnbot-mcp-server)
-- [GitHub: bnbot-mcp-server](https://github.com/bnbot-ai/bnbot-mcp-server)
-- [ClawMoney](https://clawmoney.ai) — Social task marketplace powered by BNBot
-- [OpenClaw](https://openclaw.ai) — AI agent framework
-- Twitter: [@BNBOT_AI](https://x.com/BNBOT_AI)
+When scraping content from Xiaohongshu or other platforms with many images (e.g. 10), just pass all images to `post-tweet` and it handles the splitting automatically.
+
+## If extension is not connected
+
+If `bnbot get-extension-status` shows `connected: false`, tell the user:
+
+> Chrome Extension is not connected. Please:
+> 1. Install extension: https://chromewebstore.google.com/detail/bnbot-your-ai-growth-agen/haammgigdkckogcgnbkigfleejpaiiln
+> 2. Open https://x.com in Chrome
+> 3. Open BNBot sidebar → Settings → turn on **OpenClaw**
+
+## Available CLI commands
+
+### Status
+- `bnbot get-extension-status` — Check if extension is connected
+- `bnbot get-current-page-info` — Get current Twitter/X page info
+
+### Navigation
+- `bnbot navigate-to-tweet --tweetUrl <url>`
+- `bnbot navigate-to-search --query "..." [--sort ...]`
+- `bnbot navigate-to-bookmarks`
+- `bnbot navigate-to-notifications`
+- `bnbot navigate-to-following`
+- `bnbot return-to-timeline`
+
+### Posting
+- `bnbot post-tweet --text "..."`
+- `bnbot post-thread --tweets '[{"text":"..."},{"text":"..."}]'`
+- `bnbot submit-reply --text "..." [--tweetUrl <url>]`
+- `bnbot quote-tweet --tweetUrl <url> --text "..."`
+
+### Engagement
+- `bnbot like-tweet [--tweetUrl <url>]`
+- `bnbot retweet [--tweetUrl <url>]`
+- `bnbot follow-user --username <handle>`
+
+### Scraping
+- `bnbot scrape-timeline --limit <n> --scrollAttempts <n>`
+- `bnbot scrape-bookmarks --limit <n>`
+- `bnbot scrape-search-results --query "..." --limit <n>`
+- `bnbot scrape-current-view`
+- `bnbot scrape-thread --tweetUrl <url>`
+- `bnbot account-analytics --startDate YYYY-MM-DD --endDate YYYY-MM-DD`
+
+### Content Fetching
+- `bnbot fetch-wechat-article --url <url>`
+- `bnbot fetch-tiktok-video --url <url>`
+- `bnbot fetch-xiaohongshu-note --url <url>`
+
+### Articles
+- `bnbot open-article-editor`
+- `bnbot fill-article-title --title "..."`
+- `bnbot fill-article-body --content "..." [--format markdown]`
+- `bnbot upload-article-header-image --headerImage <path>`
+- `bnbot publish-article [--publish true]`
+- `bnbot create-article --title "..." --content "..." [--format markdown]`
+
+### Jobs
+- `bnbot search-jobs [--type boost] [--limit 10]`

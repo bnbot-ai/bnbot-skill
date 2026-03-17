@@ -73,7 +73,7 @@ If `bnbot get-extension-status` shows `connected: false`, tell the user:
 > Chrome Extension is not connected. Please:
 > 1. Install extension: https://chromewebstore.google.com/detail/bnbot-your-ai-growth-agen/haammgigdkckogcgnbkigfleejpaiiln
 > 2. Open https://x.com in Chrome
-> 3. Open BNBot sidebar → Settings → turn on MCP
+> 3. Open BNBot sidebar → Settings → turn on **OpenClaw**
 
 ## Available CLI commands
 
